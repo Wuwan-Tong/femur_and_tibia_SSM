@@ -3,8 +3,8 @@
 
 %% set parameters
 % Confirm the input images
-dirName_r='dSampOut_tibia/r';%'dSampIn_femur/r';%'dSampIn_femur/r';
-dirName_l='dSampOut_tibia/l';%'dSampIn_femur/l';
+dirName_r='dSampIn_tibia/r';%'dSampIn_femur/r';%'dSampIn_femur/r';
+dirName_l='dSampIn_tibia/l';%'dSampIn_femur/l';
 % deside if scale the bone or not in TMM, 1: to scale, 0:not to scale
 toScale=0;
 % set the number of TMM components and the number of iterate for EM algorithm,and prealignment
@@ -19,7 +19,7 @@ weightEigVec=3;
 % Means-3SD Means-2SD Means-SD Means Means+SD Means+2SD Means+3SD
 weightEigVecGrad=1:1:3;
 % plot type of SSM visualization, 'points' or 'mesh'
-plotType='mesh';
+plotType='points';
 % set the cut off percentage, range:[0,1], if you want to leave 1/3 of the bone, set
 % cutOffPerc=2/3
 cutOffPerc=0.5;
@@ -103,7 +103,7 @@ title("SSM-original bones first 2 bone in dir")
 % downsample to around 1k points to reduce the running time
 % dSampSyntheticBoneData_pre = dSampPtImg(SyntheticBoneData_pre,9);
 
-[MU,Transform_pre,TrainingSet_pre,UP,PP,Mcoeffs,nu,convg,SSM_pre]=TMMgroupwiseReg(SyntheticBoneData_pre,M_pre,i_ter_pre,1);
+[MU,Transform_pre,TrainingSet_pre,UP,PP,Mcoeffs,nu,convg,SSM_pre]=TMMgroupwiseReg(SyntheticBoneData_pre_rot,M_pre,i_ter_pre,1);
 
 %% test trying to rotate tibia by TMM wothout scaling (tested, failed :(
 % SyntheticBoneData_pre1=cell(1,length(SyntheticBoneData_pre));
@@ -116,10 +116,10 @@ title("SSM-original bones first 2 bone in dir")
 % [MU,Transform_pre1,TrainingSet_pre1,UP,PP,Mcoeffs,nu,convg,SSM_pre1]=TMMgroupwiseReg_noScale(SyntheticBoneData_pre2,M_pre,i_ter_pre,1);
 
 %% use transform to do the alignment
-SyntheticBoneData_temp=cell(1,length(SyntheticBoneData_pre));
+SyntheticBoneData_temp=cell(1,length(SyntheticBoneData_pre_rot));
 centroid = [0,0,0];
-for k=1:length(SyntheticBoneData_pre)
-    pts = SyntheticBoneData_pre{k};
+for k=1:length(SyntheticBoneData_pre_rot)
+    pts = SyntheticBoneData_pre_rot{k};
     cpts = mean(pts,1);
     diffp = cpts-centroid;
     npts = bsxfun(@minus,pts,diffp);
@@ -127,7 +127,7 @@ for k=1:length(SyntheticBoneData_pre)
 end
 
 figure
-for i=1:length(SyntheticBoneData_pre)
+for i=1:length(SyntheticBoneData_pre_rot)
     cX = SyntheticBoneData_temp{i};
     rk = Transform_pre(i).R;
     tk = Transform_pre(i).t;
